@@ -11,6 +11,7 @@
         alt="روضة فسيلة الأوراس"
         className="w-14 h-14 md:w-16 md:h-16 rounded-full object-cover shadow-md group-hover:scale-105 transition duration-300"
       />
+      
 
       <div>
         <h1 className="text-lg md:text-2xl font-extrabold text-green-700">
@@ -449,119 +450,8 @@ export default function Home() {
 </section>
 
 
-     {/* ================= ABOUT ================= */}
-<section className="py-20 bg-green-50 px-6 md:px-8">
+   
 
-  <div className="max-w-6xl mx-auto">
-
-    {/* Title */}
-    <div className="text-center mb-14">
-
-      <span className="inline-block bg-white text-green-700 px-5 py-2 rounded-full font-bold text-sm mb-4 shadow-sm">
-        🌿 عن روضتنا
-      </span>
-
-      <h2 className="text-4xl md:text-5xl font-extrabold text-green-800">
-        نبذة عن روضة فسيلة الأوراس
-      </h2>
-
-    </div>
-
-
-    {/* Description */}
-    <div className="max-w-4xl mx-auto text-center mb-12">
-
-      <p className="text-gray-700 text-lg md:text-xl leading-9">
-        روضة فسيلة الأوراس فضاء تربوي مخصص لرعاية وتعليم الأطفال
-        في بيئة آمنة ومحفزة، نعتمد فيها على منهج تربوي حديث يساعد الطفل
-        على اكتشاف قدراته وتنمية استقلاليته من خلال التعلم باللعب والتجربة.
-      </p>
-
-    </div>
-
-
-    {/* Information Cards */}
-    <div className="grid md:grid-cols-3 gap-7">
-
-      {/* Location */}
-      <div className="bg-white rounded-3xl p-8 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-300 text-center">
-
-        <div className="w-16 h-16 mx-auto flex items-center justify-center bg-green-100 rounded-2xl text-4xl mb-5">
-          📍
-        </div>
-
-        <h3 className="text-xl font-extrabold text-green-700 mb-3">
-          الموقع
-        </h3>
-
-        <p className="text-gray-600 leading-7">
-          روضة فسيلة الأوراس
-          <br />
-          حي بن بوالعيد مقابل وحدة العلاج
-        </p>
-
-      </div>
-
-
-      {/* Age */}
-      <div className="bg-white rounded-3xl p-8 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-300 text-center">
-
-        <div className="w-16 h-16 mx-auto flex items-center justify-center bg-yellow-100 rounded-2xl text-4xl mb-5">
-          👧
-        </div>
-
-        <h3 className="text-xl font-extrabold text-yellow-600 mb-3">
-          الفئة العمرية
-        </h3>
-
-        <p className="text-gray-600 leading-7">
-          استقبال الأطفال
-          <br />
-          من 6 أشهر إلى 6 سنوات
-        </p>
-
-      </div>
-
-
-      {/* Vision */}
-      <div className="bg-white rounded-3xl p-8 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-300 text-center">
-
-        <div className="w-16 h-16 mx-auto flex items-center justify-center bg-blue-100 rounded-2xl text-4xl mb-5">
-          🌱
-        </div>
-
-        <h3 className="text-xl font-extrabold text-blue-700 mb-3">
-          رؤيتنا
-        </h3>
-
-        <p className="text-gray-600 leading-7">
-          بناء شخصية طفل مستقل،
-          <br />
-          مبدع وواثق من نفسه.
-        </p>
-
-      </div>
-
-    </div>
-
-
-    {/* Map Button */}
-    <div className="text-center mt-10">
-
-      <a
-        href="https://maps.app.goo.gl/dVacjgf6WgW2ZCGj7?g_st=ic"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center justify-center gap-2 bg-green-700 hover:bg-green-800 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-md hover:shadow-lg transition"
-      >
-        📍 موقع الروضة على الخريطة
-      </a>
-
-    </div>
-
-  </div>
-
-</section>
 
 
 

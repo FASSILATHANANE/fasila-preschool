@@ -28,14 +28,55 @@ export default function JobsPage() {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
 
-    setLoading(true);
-    setSuccess("");
-    setError("");
+  setLoading(true);
+  setSuccess("");
+  setError("");
 
-    const { error } = await supabase
+  try {
+    const fileInput = document.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement;
+
+    const file = fileInput?.files?.[0];
+
+    let cvUrl = "";
+
+    // رفع السيرة الذاتية
+    if (file) {
+      const fileExt = file.name.split(".").pop()?.toLowerCase();
+
+      if (!["pdf", "doc", "docx"].includes(fileExt || "")) {
+        setError("يرجى رفع ملف PDF أو Word فقط.");
+        setLoading(false);
+        return;
+      }
+
+      const fileName = `${Date.now()}-${Math.random()
+        .toString(36)
+        .substring(2)}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("job-applications")
+        .upload(fileName, file);
+
+      if (uploadError) {
+        console.error(uploadError);
+        setError("حدث خطأ أثناء رفع السيرة الذاتية.");
+        setLoading(false);
+        return;
+      }
+
+      cvUrl = fileName;
+    }
+
+const { data: authData } = await supabase.auth.getSession();
+
+console.log("SESSION:", authData.session);
+    // حفظ طلب التوظيف
+    const { error: insertError } = await supabase
       .from("job_applications")
       .insert([
         {
@@ -45,16 +86,16 @@ export default function JobsPage() {
           email: form.email,
           position: form.position,
           experience: form.experience,
+          cv_url: cvUrl,
         },
       ]);
 
-    setLoading(false);
-
-    if (error) {
-      console.error(error);
-      setError("حدث خطأ أثناء إرسال الطلب. حاولي مرة أخرى.");
-      return;
-    }
+    if (insertError) {
+  console.error("INSERT ERROR:", insertError);
+  setError(insertError.message);
+  setLoading(false);
+  return;
+}
 
     setSuccess(
       "تم إرسال طلب التوظيف بنجاح ✅ سنتواصل معك عند دراسة طلبك."
@@ -68,7 +109,19 @@ export default function JobsPage() {
       position: "",
       experience: "",
     });
-  };
+
+    if (fileInput) {
+      fileInput.value = "";
+    }
+  } catch (err) {
+    console.error(err);
+    setError("حدث خطأ غير متوقع. حاولي مرة أخرى.");
+  }
+
+  setLoading(false);
+};
+
+
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-green-50 to-white">
