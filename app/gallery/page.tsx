@@ -21,7 +21,7 @@ export default function Gallery() {
           />
 
           <img
-            src="/images/activity2.jpg"
+            src="/images/1.jpg"
             alt="نشاط 2"
             className="rounded-3xl shadow-lg h-72 w-full object-cover hover:scale-105 transition duration-300"
           />
