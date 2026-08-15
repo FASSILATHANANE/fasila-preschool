@@ -15,8 +15,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "روضة فسيلة الأوراس",
   description: "الموقع الرسمي لروضة فسيلة الأوراس",
+  icons: {
+    icon: "/logo.jpg",
+  },
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{
