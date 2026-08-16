@@ -134,7 +134,7 @@ export default function Dashboard() {
     fileName: string
   ) {
     if (!path) {
-      alert(الوثيقة ${fileName} غير موجودة.);
+      alert(`الوثيقة ${fileName} غير موجودة.`);
       return;
     }
 
