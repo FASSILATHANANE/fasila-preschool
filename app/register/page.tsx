@@ -10,6 +10,8 @@ export default function Register() {
   const [gender, setGender] = useState("");
   const [address, setAddress] = useState("");
 
+  const [classType, setClassType] = useState("");
+
   const [fatherFirstName, setFatherFirstName] = useState("");
   const [fatherLastName, setFatherLastName] = useState("");
   const [fatherPhone, setFatherPhone] = useState("");
@@ -47,6 +49,11 @@ export default function Register() {
 
     if (!firstName || !lastName || !birthDate || !gender) {
       setError("يرجى ملء معلومات الطفل الأساسية.");
+      return;
+    }
+
+    if (!classType) {
+      setError("يرجى اختيار قسم الطفل.");
       return;
     }
 
@@ -103,8 +110,13 @@ export default function Register() {
               gender: gender,
               address: address,
 
+              // القسم
+              class_type: classType,
+
+              // نوع الدوام
               subscription_type: subscriptionType,
               monthly_fee: monthlyFee,
+
               transport_requested: transportRequested,
               transport_fee: transportFee,
               terms_accepted: termsAccepted,
@@ -225,6 +237,8 @@ export default function Register() {
       setGender("");
       setAddress("");
 
+      setClassType("");
+
       setFatherFirstName("");
       setFatherLastName("");
       setFatherPhone("");
@@ -267,7 +281,10 @@ export default function Register() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-green-50 to-white py-20 px-6">
+    <main
+      className="min-h-screen bg-gradient-to-b from-green-50 to-white py-20 px-6"
+      dir="rtl"
+    >
 
       <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl p-10">
 
@@ -312,7 +329,7 @@ export default function Register() {
           className="space-y-8"
         >
 
-          {/* معلومات الطفل */}
+          {/* ================= معلومات الطفل ================= */}
 
           <h2 className="text-2xl font-bold text-green-800 border-b pb-2">
             👶 معلومات الطفل
@@ -395,7 +412,7 @@ export default function Register() {
 
           </div>
 
-          {/* معلومات ولي الأمر */}
+          {/* ================= معلومات ولي الأمر ================= */}
 
           <h2 className="text-2xl font-bold text-green-800 border-b pb-2">
             👨 معلومات ولي الأمر
@@ -519,13 +536,16 @@ export default function Register() {
 
           </div>
 
-          {/* الاشتراك والأسعار */}
+
+          {/* ================= الاشتراك ================= */}
 
           <h2 className="text-2xl font-bold text-green-800 border-b pb-2">
             💳 معلومات الاشتراك
           </h2>
 
           <div className="bg-green-50 border border-green-200 rounded-2xl p-6 space-y-6">
+
+            {/* نوع الدوام */}
 
             <div>
 
@@ -549,13 +569,75 @@ export default function Register() {
                   دوام كامل — 9000 دج / الشهر
                 </option>
 
-                <option value="نصف دوام">
-                  نصف دوام — 5000 دج / الشهر
+                <option value="نصف يوم صباحًا">
+                  نصف يوم صباحًا — 5000 دج / الشهر
+                </option>
+
+                <option value="نصف يوم مساءً">
+                  نصف يوم مساءً — 5000 دج / الشهر
                 </option>
 
               </select>
 
             </div>
+          {/* ================= قسم الطفل ================= */}
+
+          <div>
+
+            <h2 className="text-2xl font-bold text-green-800 border-b pb-2 mb-5">
+              🏫 قسم الطفل
+            </h2>
+
+            <p className="text-gray-700 mb-4">
+              يرجى اختيار القسم المناسب للطفل:
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-3">
+
+              {[
+                "الحضانة",
+                "قبل التمهيدي",
+                "التمهيدي",
+                "التحضيري",
+              ].map((className) => (
+
+                <label
+                  key={className}
+                  className={`flex items-center gap-3 border rounded-xl p-4 cursor-pointer transition ${
+                    classType === className
+                      ? "border-green-600 bg-green-50"
+                      : "border-gray-300 bg-white hover:bg-green-50"
+                  }`}
+                >
+
+                  <input
+                    type="radio"
+                    name="classType"
+                    value={className}
+                    checked={classType === className}
+                    onChange={(e) =>
+                      setClassType(e.target.value)
+                    }
+                    className="w-5 h-5 accent-green-700"
+                  />
+
+                  <span className="font-bold text-gray-900">
+                    {className}
+                  </span>
+
+                  {classType === className && (
+                    <span className="mr-auto text-green-700 font-bold">
+                      ✓
+                    </span>
+                  )}
+
+                </label>
+
+              ))}
+
+            </div>
+
+          </div>
 
             {/* التوصيل */}
 
@@ -668,7 +750,7 @@ export default function Register() {
 
           </div>
 
-          {/* الموافقة */}
+          {/* ================= الموافقة ================= */}
 
           <div className="bg-gray-50 border border-gray-300 rounded-2xl p-5">
 
@@ -695,7 +777,7 @@ export default function Register() {
 
           </div>
 
-          {/* معلومات صحية */}
+          {/* ================= معلومات صحية ================= */}
 
           <h2 className="text-2xl font-bold text-green-800 border-b pb-2">
             🩺 معلومات صحية
@@ -753,7 +835,7 @@ export default function Register() {
             className="w-full border border-gray-400 rounded-xl p-4 text-black placeholder:text-gray-700"
           />
 
-          {/* الوثائق */}
+          {/* ================= الوثائق ================= */}
 
           <h2 className="text-2xl font-bold text-green-800 border-b pb-2">
             📄 الوثائق المطلوبة
@@ -797,7 +879,7 @@ export default function Register() {
 
           </div>
 
-          {/* زر الإرسال */}
+          {/* ================= زر الإرسال ================= */}
 
           <button
             type="submit"

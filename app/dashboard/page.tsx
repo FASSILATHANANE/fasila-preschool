@@ -11,6 +11,9 @@ type Child = {
   gender: string;
   address: string | null;
 
+  class_type: string | null;
+  subscription_type: string | null;
+
   father_first_name: string | null;
   father_last_name: string | null;
   father_phone: string | null;
@@ -21,7 +24,6 @@ type Child = {
 
   email: string | null;
 
-  subscription_type: string | null;
   monthly_fee: number | null;
   transport_requested: boolean | null;
   transport_fee: number | null;
@@ -57,7 +59,6 @@ export default function Dashboard() {
     setError("");
 
     try {
-      // جلب الأطفال والتسجيلات
       const { data: childrenData, error: childrenError } =
         await supabase
           .from("children")
@@ -68,7 +69,6 @@ export default function Dashboard() {
         throw childrenError;
       }
 
-      // جلب الوثائق
       const { data: documentsData, error: documentsError } =
         await supabase
           .from("child_documents")
@@ -137,7 +137,8 @@ export default function Dashboard() {
 
   const halfTimeChildren = children.filter(
     (child) =>
-      child.subscription_type === "نصف دوام"
+      child.subscription_type === "نصف يوم صباحًا" ||
+      child.subscription_type === "نصف يوم مساءً"
   ).length;
 
   const transportChildren = children.filter(
@@ -388,6 +389,13 @@ export default function Dashboard() {
                           👤 {child.gender}
                         </p>
 
+                        {/* القسم */}
+
+                        <p className="text-green-700 font-bold mt-2">
+                          🏫 القسم:{" "}
+                          {child.class_type || "غير محدد"}
+                        </p>
+
                       </div>
 
                       {/* الاشتراك */}
@@ -403,13 +411,11 @@ export default function Dashboard() {
                             "غير محدد"}
                         </p>
 
-  <p className="font-bold text-gray-900 mt-1">
-  {child.monthly_fee
-    ? child.monthly_fee + " دج / الشهر"
-    : "-"}
-</p>
-
-  
+                        <p className="font-bold text-gray-900 mt-1">
+                          {child.monthly_fee
+                            ? child.monthly_fee + " دج / الشهر"
+                            : "-"}
+                        </p>
 
                       </div>
 
@@ -574,6 +580,11 @@ export default function Dashboard() {
                 </p>
 
                 <p>
+                  <strong>القسم:</strong>{" "}
+                  {selectedChild.class_type || "-"}
+                </p>
+
+                <p>
                   <strong>العنوان:</strong>{" "}
                   {selectedChild.address || "-"}
                 </p>
@@ -634,19 +645,22 @@ export default function Dashboard() {
               <div className="space-y-3 text-gray-800">
 
                 <p>
+                  <strong>القسم:</strong>{" "}
+                  {selectedChild.class_type || "-"}
+                </p>
+
+                <p>
                   <strong>نوع الدوام:</strong>{" "}
                   {selectedChild.subscription_type ||
                     "-"}
                 </p>
 
-              
-
-<p>
-  <strong>الاشتراك الشهري:</strong>{" "}
-  {selectedChild.monthly_fee
-    ? selectedChild.monthly_fee + " دج"
-    : "-"}
-</p>
+                <p>
+                  <strong>الاشتراك الشهري:</strong>{" "}
+                  {selectedChild.monthly_fee
+                    ? selectedChild.monthly_fee + " دج"
+                    : "-"}
+                </p>
 
                 <p>
                   <strong>حقوق التسجيل:</strong>{" "}
@@ -734,3 +748,4 @@ export default function Dashboard() {
     </main>
   );
 }
+
