@@ -5,14 +5,12 @@ import { supabase } from "@/lib/supabase";
 
 type Child = {
   id: string;
+
   first_name: string;
   last_name: string;
   birth_date: string;
   gender: string;
   address: string | null;
-
-  class_type: string | null;
-  subscription_type: string | null;
 
   father_first_name: string | null;
   father_last_name: string | null;
@@ -24,9 +22,17 @@ type Child = {
 
   email: string | null;
 
+  // القسم
+  class_type: string | null;
+
+  // نوع الدوام
+  subscription_type: string | null;
+
   monthly_fee: number | null;
+
   transport_requested: boolean | null;
   transport_fee: number | null;
+
   terms_accepted: boolean | null;
 
   created_at: string;
@@ -40,11 +46,13 @@ type Documents = {
 
 export default function Dashboard() {
   const [children, setChildren] = useState<Child[]>([]);
+
   const [documents, setDocuments] = useState<
     Record<string, Documents>
   >({});
 
   const [loading, setLoading] = useState(true);
+
   const [selectedChild, setSelectedChild] =
     useState<Child | null>(null);
 
@@ -59,20 +67,34 @@ export default function Dashboard() {
     setError("");
 
     try {
-      const { data: childrenData, error: childrenError } =
-        await supabase
-          .from("children")
-          .select("*")
-          .order("created_at", { ascending: false });
+      // ===============================
+      // جلب التسجيلات
+      // ===============================
+
+      const {
+        data: childrenData,
+        error: childrenError,
+      } = await supabase
+        .from("children")
+        .select("*")
+        .order("created_at", {
+          ascending: false,
+        });
 
       if (childrenError) {
         throw childrenError;
       }
 
-      const { data: documentsData, error: documentsError } =
-        await supabase
-          .from("child_documents")
-          .select("*");
+      // ===============================
+      // جلب الوثائق
+      // ===============================
+
+      const {
+        data: documentsData,
+        error: documentsError,
+      } = await supabase
+        .from("child_documents")
+        .select("*");
 
       if (documentsError) {
         throw documentsError;
@@ -80,7 +102,10 @@ export default function Dashboard() {
 
       setChildren(childrenData || []);
 
-      const documentsMap: Record<string, Documents> = {};
+      const documentsMap: Record<
+        string,
+        Documents
+      > = {};
 
       (documentsData || []).forEach((doc) => {
         documentsMap[doc.child_id] = doc;
@@ -100,18 +125,23 @@ export default function Dashboard() {
     }
   }
 
+  // ===============================
+  // فتح الوثيقة
+  // ===============================
+
   async function openDocument(
     path: string | null,
     fileName: string
   ) {
     if (!path) {
-      alert("الوثيقة غير موجودة.");
+      alert(الوثيقة ${fileName} غير موجودة.);
       return;
     }
 
-    const { data, error } = await supabase.storage
-      .from("child-documents")
-      .createSignedUrl(path, 300);
+    const { data, error } =
+      await supabase.storage
+        .from("child-documents")
+        .createSignedUrl(path, 300);
 
     if (error || !data?.signedUrl) {
       console.error(error);
@@ -122,11 +152,42 @@ export default function Dashboard() {
     window.open(data.signedUrl, "_blank");
   }
 
+  // ===============================
+  // التاريخ
+  // ===============================
+
   function formatDate(date: string) {
     if (!date) return "-";
 
-    return new Date(date).toLocaleDateString("ar-DZ");
+    return new Date(date).toLocaleDateString(
+      "ar-DZ",
+      {
+        timeZone: "Africa/Algiers",
+      }
+    );
   }
+
+  // ===============================
+  // تاريخ ووقت التسجيل
+  // توقيت الجزائر
+  // ===============================
+
+  function formatDateTime(date: string) {
+    if (!date) return "-";
+
+    return new Date(date).toLocaleString(
+      "ar-DZ",
+      {
+        timeZone: "Africa/Algiers",
+        dateStyle: "short",
+        timeStyle: "short",
+      }
+    );
+  }
+
+  // ===============================
+  // الإحصائيات
+  // ===============================
 
   const totalChildren = children.length;
 
@@ -137,12 +198,32 @@ export default function Dashboard() {
 
   const halfTimeChildren = children.filter(
     (child) =>
-      child.subscription_type === "نصف يوم صباحًا" ||
-      child.subscription_type === "نصف يوم مساءً"
+      child.subscription_type === "نصف دوام"
   ).length;
 
   const transportChildren = children.filter(
     (child) => child.transport_requested
+  ).length;
+
+  const nurseryChildren = children.filter(
+    (child) =>
+      child.class_type === "حضانة"
+  ).length;
+
+  const beforePreparatoryChildren =
+    children.filter(
+      (child) =>
+        child.class_type === "قبل التمهيدي"
+    ).length;
+
+  const preparatoryChildren = children.filter(
+    (child) =>
+      child.class_type === "تمهيدي"
+  ).length;
+
+  const preschoolChildren = children.filter(
+    (child) =>
+      child.class_type === "تحضيري"
   ).length;
 
   return (
@@ -150,8 +231,9 @@ export default function Dashboard() {
       className="min-h-screen bg-green-50 flex"
       dir="rtl"
     >
-
-      {/* ================= Sidebar ================= */}
+      {/* =====================================
+          Sidebar
+      ===================================== */}
 
       <aside className="w-72 bg-green-800 text-white p-6 hidden md:block">
 
@@ -199,7 +281,9 @@ export default function Dashboard() {
 
       </aside>
 
-      {/* ================= Content ================= */}
+      {/* =====================================
+          المحتوى
+      ===================================== */}
 
       <section className="flex-1 p-8">
 
@@ -208,6 +292,7 @@ export default function Dashboard() {
         <div className="flex justify-between items-center mb-8">
 
           <div>
+
             <h2 className="text-3xl font-bold text-green-700">
               لوحة التحكم
             </h2>
@@ -215,10 +300,11 @@ export default function Dashboard() {
             <p className="text-gray-600 mt-2">
               إدارة ومتابعة تسجيلات روضة فسيلة الأوراس
             </p>
+
           </div>
 
           <button
-            onClick={() => loadDashboard()}
+            onClick={loadDashboard}
             className="bg-green-700 hover:bg-green-800 text-white px-5 py-3 rounded-xl"
           >
             🔄 تحديث
@@ -234,7 +320,9 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* ================= Cards ================= */}
+        {/* =====================================
+            البطاقات الرئيسية
+        ===================================== */}
 
         <div className="grid md:grid-cols-4 gap-6">
 
@@ -247,11 +335,13 @@ export default function Dashboard() {
             </div>
 
             <h3 className="font-bold text-xl">
-              الأطفال
+              إجمالي الأطفال
             </h3>
 
             <p className="text-gray-600 mt-2 text-lg">
-              {loading ? "..." : `${totalChildren} طفل`}
+              {loading
+                ? "..."
+                : `${totalChildren} طفل`}
             </p>
 
           </div>
@@ -318,7 +408,97 @@ export default function Dashboard() {
 
         </div>
 
-        {/* ================= التسجيلات ================= */}
+        {/* =====================================
+            إحصائيات الأقسام
+        ===================================== */}
+
+        <div className="mt-8">
+
+          <h3 className="text-2xl font-bold text-green-700 mb-5">
+            🎓 توزيع الأطفال حسب القسم
+          </h3>
+
+          <div className="grid md:grid-cols-4 gap-5">
+
+            <div className="bg-white rounded-2xl shadow p-5 border-r-4 border-purple-500">
+
+              <p className="text-gray-600 font-bold">
+                حضانة
+              </p>
+
+              <p className="text-3xl font-bold text-purple-700 mt-2">
+                {loading
+                  ? "..."
+                  : nurseryChildren}
+              </p>
+
+              <p className="text-gray-500">
+                طفل
+              </p>
+
+            </div>
+
+            <div className="bg-white rounded-2xl shadow p-5 border-r-4 border-pink-500">
+
+              <p className="text-gray-600 font-bold">
+                قبل التمهيدي
+              </p>
+
+              <p className="text-3xl font-bold text-pink-700 mt-2">
+                {loading
+                  ? "..."
+                  : beforePreparatoryChildren}
+              </p>
+
+              <p className="text-gray-500">
+                طفل
+              </p>
+
+            </div>
+
+            <div className="bg-white rounded-2xl shadow p-5 border-r-4 border-blue-500">
+
+              <p className="text-gray-600 font-bold">
+                تمهيدي
+              </p>
+
+              <p className="text-3xl font-bold text-blue-700 mt-2">
+                {loading
+                  ? "..."
+                  : preparatoryChildren}
+              </p>
+
+              <p className="text-gray-500">
+                طفل
+              </p>
+
+            </div>
+
+            <div className="bg-white rounded-2xl shadow p-5 border-r-4 border-green-500">
+
+              <p className="text-gray-600 font-bold">
+                تحضيري
+              </p>
+
+              <p className="text-3xl font-bold text-green-700 mt-2">
+                {loading
+                  ? "..."
+                  : preschoolChildren}
+              </p>
+
+              <p className="text-gray-500">
+                طفل
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* =====================================
+            التسجيلات
+        ===================================== */}
 
         <div className="mt-10 bg-white rounded-2xl shadow p-6">
 
@@ -327,7 +507,7 @@ export default function Dashboard() {
             <div>
 
               <h3 className="text-2xl font-bold text-green-700">
-                📝 التسجيلات الأخيرة
+                📝 إجمالي الطلبات
               </h3>
 
               <p className="text-gray-600 mt-1">
@@ -341,6 +521,8 @@ export default function Dashboard() {
             </span>
 
           </div>
+
+          {/* Loading */}
 
           {loading ? (
 
@@ -356,7 +538,7 @@ export default function Dashboard() {
 
           ) : (
 
-            <div className="space-y-4">
+            <div className="space-y-5">
 
               {children.map((child) => {
 
@@ -370,11 +552,13 @@ export default function Dashboard() {
                     className="border border-gray-200 rounded-2xl p-5 hover:shadow-md transition"
                   >
 
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+                    {/* المعلومات الأساسية */}
 
-                      {/* معلومات الطفل */}
+                    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
 
-                      <div>
+                      {/* الطفل */}
+
+                      <div className="min-w-[220px]">
 
                         <h4 className="text-xl font-bold text-green-800">
                           {child.first_name}{" "}
@@ -382,38 +566,57 @@ export default function Dashboard() {
                         </h4>
 
                         <p className="text-gray-600 mt-2">
-                          📅 {formatDate(child.birth_date)}
+                          📅 تاريخ الميلاد:{" "}
+                          {formatDate(
+                            child.birth_date
+                          )}
                         </p>
 
                         <p className="text-gray-600 mt-1">
-                          👤 {child.gender}
+                          👤 الجنس:{" "}
+                          {child.gender}
                         </p>
 
-                        {/* القسم */}
-
-                        <p className="text-green-700 font-bold mt-2">
-                          🏫 القسم:{" "}
-                          {child.class_type || "غير محدد"}
+                        <p className="text-gray-500 text-sm mt-2">
+                          🕐 تسجيل الطلب:{" "}
+                          {formatDateTime(
+                            child.created_at
+                          )}
                         </p>
 
                       </div>
 
-                      {/* الاشتراك */}
+                      {/* القسم */}
 
-                      <div className="bg-green-50 rounded-xl p-4 min-w-[220px]">
+                      <div className="bg-purple-50 rounded-xl p-4 min-w-[200px]">
 
-                        <p className="font-bold text-green-800">
-                          💳 الاشتراك
+                        <p className="font-bold text-purple-800">
+                          🎓 القسم
                         </p>
 
-                        <p className="text-gray-800 mt-2">
+                        <p className="text-gray-800 mt-2 font-bold text-lg">
+                          {child.class_type ||
+                            "غير محدد"}
+                        </p>
+
+                      </div>
+
+                      {/* نوع الدوام */}
+
+                      <div className="bg-green-50 rounded-xl p-4 min-w-[200px]">
+
+                        <p className="font-bold text-green-800">
+                          🕐 نوع الدوام
+                        </p>
+
+                        <p className="text-gray-800 mt-2 font-bold text-lg">
                           {child.subscription_type ||
                             "غير محدد"}
                         </p>
 
                         <p className="font-bold text-gray-900 mt-1">
                           {child.monthly_fee
-                            ? child.monthly_fee + " دج / الشهر"
+                            ? ${child.monthly_fee} دج / الشهر
                             : "-"}
                         </p>
 
@@ -421,7 +624,7 @@ export default function Dashboard() {
 
                       {/* التوصيل */}
 
-                      <div className="bg-blue-50 rounded-xl p-4 min-w-[220px]">
+                      <div className="bg-blue-50 rounded-xl p-4 min-w-[200px]">
 
                         <p className="font-bold text-blue-800">
                           🚐 التوصيل
@@ -449,58 +652,59 @@ export default function Dashboard() {
 
                       </div>
 
-                      {/* الأزرار */}
+                    </div>
 
-                      <div className="flex flex-wrap gap-2">
+                    {/* الأزرار */}
+
+                    <div className="flex flex-wrap gap-2 mt-5">
+
+                      <button
+                        onClick={() =>
+                          setSelectedChild(child)
+                        }
+                        className="bg-green-700 hover:bg-green-800 text-white px-4 py-3 rounded-xl font-bold"
+                      >
+                        👁️ التفاصيل
+                      </button>
+
+                      {childDocuments?.birth_certificate && (
 
                         <button
                           onClick={() =>
-                            setSelectedChild(child)
+                            openDocument(
+                              childDocuments.birth_certificate,
+                              "شهادة الميلاد"
+                            )
                           }
-                          className="bg-green-700 hover:bg-green-800 text-white px-4 py-3 rounded-xl font-bold"
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl font-bold"
                         >
-                          👁️ التفاصيل
+                          📄 شهادة الميلاد
                         </button>
 
-                        {childDocuments?.birth_certificate && (
+                      )}
 
-                          <button
-                            onClick={() =>
-                              openDocument(
-                                childDocuments.birth_certificate,
-                                "شهادة الميلاد"
-                              )
-                            }
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl font-bold"
-                          >
-                            📄 شهادة الميلاد
-                          </button>
+                      {childDocuments?.vaccination_book && (
 
-                        )}
+                        <button
+                          onClick={() =>
+                            openDocument(
+                              childDocuments.vaccination_book,
+                              "دفتر التلقيح"
+                            )
+                          }
+                          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-xl font-bold"
+                        >
+                          📕 دفتر التلقيح
+                        </button>
 
-                        {childDocuments?.vaccination_book && (
-
-                          <button
-                            onClick={() =>
-                              openDocument(
-                                childDocuments.vaccination_book,
-                                "دفتر التلقيح"
-                              )
-                            }
-                            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-xl font-bold"
-                          >
-                            📕 دفتر التلقيح
-                          </button>
-
-                        )}
-
-                      </div>
+                      )}
 
                     </div>
 
                   </div>
 
                 );
+
               })}
 
             </div>
@@ -509,7 +713,9 @@ export default function Dashboard() {
 
         </div>
 
-        {/* ================= الترحيب ================= */}
+        {/* =====================================
+            الترحيب
+        ===================================== */}
 
         <div className="mt-10 bg-white rounded-2xl shadow p-8">
 
@@ -519,14 +725,17 @@ export default function Dashboard() {
 
           <p className="text-gray-700 leading-8">
             من هنا يمكنك متابعة الأطفال والتسجيلات
-            والاشتراكات والتوصيل والوثائق بطريقة منظمة وسهلة.
+            والأقسام والاشتراكات والتوصيل والوثائق
+            بطريقة منظمة وسهلة.
           </p>
 
         </div>
 
       </section>
 
-      {/* ================= نافذة التفاصيل ================= */}
+      {/* =====================================
+          نافذة التفاصيل
+      ===================================== */}
 
       {selectedChild && (
 
@@ -534,11 +743,21 @@ export default function Dashboard() {
 
           <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-8">
 
+            {/* رأس النافذة */}
+
             <div className="flex justify-between items-center mb-6">
 
-              <h2 className="text-2xl font-bold text-green-800">
-                👶 ملف الطفل
-              </h2>
+              <div>
+
+                <h2 className="text-2xl font-bold text-green-800">
+                  👶 تفاصيل طلب التسجيل
+                </h2>
+
+                <p className="text-gray-500 mt-1">
+                  معلومات الطفل وولي الأمر والوثائق
+                </p>
+
+              </div>
 
               <button
                 onClick={() =>
@@ -551,12 +770,14 @@ export default function Dashboard() {
 
             </div>
 
-            {/* الطفل */}
+            {/* =====================================
+                معلومات الطفل
+            ===================================== */}
 
             <div className="bg-green-50 rounded-2xl p-5 mb-5">
 
               <h3 className="text-xl font-bold text-green-800 mb-4">
-                معلومات الطفل
+                👶 معلومات الطفل
               </h3>
 
               <div className="grid md:grid-cols-2 gap-3 text-gray-800">
@@ -580,25 +801,42 @@ export default function Dashboard() {
                 </p>
 
                 <p>
-                  <strong>القسم:</strong>{" "}
-                  {selectedChild.class_type || "-"}
+                  <strong>العنوان:</strong>{" "}
+                  {selectedChild.address ||
+                    "-"}
                 </p>
 
                 <p>
-                  <strong>العنوان:</strong>{" "}
-                  {selectedChild.address || "-"}
+                  <strong>القسم:</strong>{" "}
+                  {selectedChild.class_type ||
+                    "غير محدد"}
+                </p>
+
+                <p>
+                  <strong>نوع الدوام:</strong>{" "}
+                  {selectedChild.subscription_type ||
+                    "غير محدد"}
+                </p>
+
+                <p>
+                  <strong>تاريخ ووقت التسجيل:</strong>{" "}
+                  {formatDateTime(
+                    selectedChild.created_at
+                  )}
                 </p>
 
               </div>
 
             </div>
 
-            {/* الولي */}
+            {/* =====================================
+                ولي الأمر
+            ===================================== */}
 
             <div className="bg-gray-50 rounded-2xl p-5 mb-5">
 
               <h3 className="text-xl font-bold text-green-800 mb-4">
-                معلومات ولي الأمر
+                👨 معلومات ولي الأمر
               </h3>
 
               <div className="grid md:grid-cols-2 gap-3 text-gray-800">
@@ -611,7 +849,8 @@ export default function Dashboard() {
 
                 <p>
                   <strong>هاتف الأب:</strong>{" "}
-                  {selectedChild.father_phone || "-"}
+                  {selectedChild.father_phone ||
+                    "-"}
                 </p>
 
                 <p>
@@ -622,19 +861,23 @@ export default function Dashboard() {
 
                 <p>
                   <strong>هاتف الأم:</strong>{" "}
-                  {selectedChild.mother_phone || "-"}
+                  {selectedChild.mother_phone ||
+                    "-"}
                 </p>
 
                 <p>
                   <strong>البريد:</strong>{" "}
-                  {selectedChild.email || "-"}
+                  {selectedChild.email ||
+                    "-"}
                 </p>
 
               </div>
 
             </div>
 
-            {/* الاشتراك */}
+            {/* =====================================
+                الاشتراك والمالية
+            ===================================== */}
 
             <div className="bg-yellow-50 rounded-2xl p-5 mb-5">
 
@@ -646,7 +889,8 @@ export default function Dashboard() {
 
                 <p>
                   <strong>القسم:</strong>{" "}
-                  {selectedChild.class_type || "-"}
+                  {selectedChild.class_type ||
+                    "-"}
                 </p>
 
                 <p>
@@ -658,7 +902,7 @@ export default function Dashboard() {
                 <p>
                   <strong>الاشتراك الشهري:</strong>{" "}
                   {selectedChild.monthly_fee
-                    ? selectedChild.monthly_fee + " دج"
+                    ? `${selectedChild.monthly_fee} دج`
                     : "-"}
                 </p>
 
@@ -689,7 +933,30 @@ export default function Dashboard() {
 
             </div>
 
-            {/* الوثائق */}
+            {/* =====================================
+                تاريخ التسجيل
+            ===================================== */}
+
+            <div className="bg-orange-50 rounded-2xl p-5 mb-5">
+
+              <h3 className="text-xl font-bold text-orange-800 mb-3">
+                🕐 معلومات الطلب
+              </h3>
+
+              <p className="text-gray-800">
+                <strong>
+                  تاريخ ووقت إرسال الطلب:
+                </strong>{" "}
+                {formatDateTime(
+                  selectedChild.created_at
+                )}
+              </p>
+
+            </div>
+
+            {/* =====================================
+                الوثائق
+            ===================================== */}
 
             <div className="bg-blue-50 rounded-2xl p-5">
 
@@ -735,6 +1002,17 @@ export default function Dashboard() {
 
                 )}
 
+                {!documents[selectedChild.id]
+                  ?.birth_certificate &&
+                  !documents[selectedChild.id]
+                    ?.vaccination_book && (
+
+                  <p className="text-gray-600">
+                    لا توجد وثائق مرفوعة.
+                  </p>
+
+                )}
+
               </div>
 
             </div>
@@ -748,4 +1026,3 @@ export default function Dashboard() {
     </main>
   );
 }
-
