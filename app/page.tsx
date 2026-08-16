@@ -61,7 +61,12 @@
       >
         التسجيل
       </a>
-
+<a
+        href="/jobs"
+        className="text-white font-bold px-4 py-2 rounded-xl hover:bg-white/15 hover:text-yellow-300 transition"
+      >
+        عروض العمل
+      </a>
       <a
         href="/contact"
         className="text-white font-bold px-4 py-2 rounded-xl hover:bg-white/15 hover:text-yellow-300 transition"
