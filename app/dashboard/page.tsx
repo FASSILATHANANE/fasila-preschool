@@ -616,7 +616,7 @@ export default function Dashboard() {
 
                         <p className="font-bold text-gray-900 mt-1">
                           {child.monthly_fee
-                            ? ${child.monthly_fee} دج / الشهر
+                            ? `${child.monthly_fee} دج / الشهر`
                             : "-"}
                         </p>
 
